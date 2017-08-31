@@ -1,8 +1,9 @@
+const uuidv1 = require('uuid/v1');
 const clone = require('clone')
 
 let db = {}
 
-const defaultData = {
+var defaultData = {
   "8xf0y6ziyjabvozdd253nd": {
     id: '8xf0y6ziyjabvozdd253nd',
     timestamp: 1467166872634,
@@ -27,6 +28,10 @@ const defaultData = {
 
 function getData (token) {
   let data = db[token]
+  if (data) {
+console.log('data: ' + data)
+  console.log('keys data: ' + Object.keys(data))
+  }
   if (data == null) {
     data = db[token] = clone(defaultData)
   }
@@ -65,19 +70,35 @@ function getAll (token) {
 function add (token, post) {
   return new Promise((res) => {
     let posts = getData(token)
+
+    let id = uuidv1()
+    console.log('uuidv1: ' + id)
     
-    posts[post.id] = {
-      id: post.id,
+    posts[id] = {
+      id,
       timestamp: post.timestamp,
       title: post.title,
       body: post.body,
       author: post.author,
-      category: post.category,
+      category: post.category || "react",
       voteScore: 1,
       deleted: false
     }
      
-    res(posts[post.id])
+    res(posts[id])
+
+    // defaultData[post.id] = {
+    //   id: post.id,
+    //   timestamp: post.timestamp,
+    //   title: post.title,
+    //   body: post.body,
+    //   author: post.author,
+    //   category: post.category,
+    //   voteScore: 1,
+    //   deleted: false
+    // }
+    //  console.log('len defaultData: ' + defaultData.length)
+
   })
 }
 
@@ -85,6 +106,7 @@ function vote (token, id, option) {
   return new Promise((res) => {
     let posts = getData(token)
     post = posts[id]
+    console.log('option: ' + option)
     switch(option) {
         case "upVote":
             post.voteScore = post.voteScore + 1
